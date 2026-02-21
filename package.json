@@ -1,0 +1,8 @@
+{
+  "name": "aula-de-letras",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "cd client && npm install && cd ../server && npm install"
+  }
+}
