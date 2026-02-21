@@ -14,5 +14,8 @@ export default defineConfig({
   },
   build: {
     envPrefix: ['VITE_', 'REACT_APP_']
+  },
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || '')
   }
 })
