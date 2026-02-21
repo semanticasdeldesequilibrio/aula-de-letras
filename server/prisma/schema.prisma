@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  password_hash   String
+  nombre          String
+  apellido        String?
+  avatar_url      String?
+  bio             String?
+  institucion     String?
+  rol             String    @default("docente")
+  verificado      Boolean   @default(false)
+  activo          Boolean   @default(true)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  // Relations
+  planes          Plan[]
+  comentarios     Comentario[]
+  valoraciones    Valoracion[]
+  favoritos       Favorito[]
+  seguidores      Seguidor[]   @relation("Seguido")
+  siguiendo       Seguidor[]   @relation("Seguidor")
+  mensajes_enviados   Mensaje[] @relation("Emisor")
+  mensajes_recibidos  Mensaje[] @relation("Receptor")
+
+  @@map("usuarios")
+}
+
+model Tema {
+  id          String   @id @default(uuid())
+  nombre      String
+  descripcion String?
+  anio_escolar Int
+  orden       Int      @default(0)
+  created_at  DateTime @default(now())
+
+  planes      Plan[]
+
+  @@map("temas")
+}
+
+model Plan {
+  id                  String    @id @default(uuid())
+  titulo              String
+  descripcion         String?
+  contenido           String
+  anio_escolar        Int
+  tema_id             String
+  autor_id            String
+  estado              String    @default("pendiente")
+  duracion_estimada   String?
+  objetivos           String?
+  recursos_necesarios String?
+  descargas           Int       @default(0)
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  // Relations
+  tema        Tema          @relation(fields: [tema_id], references: [id])
+  autor       Usuario       @relation(fields: [autor_id], references: [id])
+  archivos    Archivo[]
+  comentarios Comentario[]
+  valoraciones Valoracion[]
+  favoritos   Favorito[]
+
+  @@map("planes")
+}
+
+model Archivo {
+  id              String    @id @default(uuid())
+  plan_id         String
+  nombre_original String
+  url             String
+  tipo            String
+  tamano_bytes    Int
+  created_at      DateTime  @default(now())
+
+  plan            Plan      @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+
+  @@map("archivos")
+}
+
+model Valoracion {
+  id          String   @id @default(uuid())
+  plan_id     String
+  usuario_id  String
+  estrellas   Int
+  created_at  DateTime @default(now())
+
+  plan        Plan     @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+  usuario     Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@unique([plan_id, usuario_id])
+  @@map("valoraciones")
+}
+
+model Comentario {
+  id          String   @id @default(uuid())
+  plan_id     String
+  usuario_id  String
+  contenido   String
+  reportado   Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  plan        Plan     @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+  usuario     Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@map("comentarios")
+}
+
+model Favorito {
+  usuario_id  String
+  plan_id     String
+  created_at  DateTime @default(now())
+
+  usuario     Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  plan        Plan     @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+
+  @@id([usuario_id, plan_id])
+  @@map("favoritos")
+}
+
+model Seguidor {
+  seguidor_id String
+  seguido_id  String
+  created_at  DateTime @default(now())
+
+  seguidor    Usuario  @relation("Seguidor", fields: [seguidor_id], references: [id], onDelete: Cascade)
+  seguido     Usuario  @relation("Seguido", fields: [seguido_id], references: [id], onDelete: Cascade)
+
+  @@id([seguidor_id, seguido_id])
+  @@map("seguidores")
+}
+
+model Mensaje {
+  id          String   @id @default(uuid())
+  emisor_id   String
+  receptor_id String
+  contenido   String
+  leido       Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  emisor      Usuario  @relation("Emisor", fields: [emisor_id], references: [id], onDelete: Cascade)
+  receptor    Usuario  @relation("Receptor", fields: [receptor_id], references: [id], onDelete: Cascade)
+
+  @@map("mensajes")
+}

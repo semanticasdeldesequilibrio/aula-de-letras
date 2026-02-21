@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.example
+
+# SQLite Database
+*.db
+*.db-journal
+
+# Build outputs
+dist/
+build/
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Prisma
+prisma/migrations/*
+!prisma/migrations/.gitkeep
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/
+temp/
